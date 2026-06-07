@@ -1,15 +1,15 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 WORKDIR /app
 
 FROM base AS deps
 COPY package.json package-lock.json ./
-RUN npm ci --prefer-offline --no-audit
+RUN npm ci --no-audit
 
 FROM deps AS build
 COPY . .
 RUN npm run build
 
-FROM node:20-alpine AS production
+FROM node:20-slim AS production
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY package.json ./
