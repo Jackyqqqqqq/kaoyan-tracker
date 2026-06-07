@@ -3,7 +3,7 @@ WORKDIR /app
 
 FROM base AS deps
 COPY package.json package-lock.json ./
-RUN npm install --no-audit
+RUN npm ci
 
 FROM deps AS build
 COPY . .
