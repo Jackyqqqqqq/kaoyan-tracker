@@ -15,6 +15,8 @@ COPY --from=build /app/dist ./dist
 COPY package.json ./
 COPY db ./db
 COPY drizzle.config.ts ./
+COPY app_db_export.json ./
+COPY seed.mjs ./
 
 ENV NODE_ENV=production
 EXPOSE 3000
