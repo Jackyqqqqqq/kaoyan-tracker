@@ -2,8 +2,8 @@ FROM node:20-slim AS base
 WORKDIR /app
 
 FROM base AS deps
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json ./
+RUN npm install
 
 FROM deps AS build
 COPY . .
