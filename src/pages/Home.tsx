@@ -71,7 +71,15 @@ function SectionRow({ label, score, fullScore, detail, fullDetail }: {
   );
 }
 
-function SubjectDetail({ subject, onClose }: { subject: any; onClose: () => void }) {
+interface SubjectWithSections {
+  id: number;
+  name: string;
+  target: number;
+  fullScore: number;
+  sections?: SectionItem[];
+}
+
+function SubjectDetail({ subject, onClose }: { subject: SubjectWithSections; onClose: () => void }) {
   const grouped = useMemo(() => {
     const map = new Map<string, SectionItem[]>();
     (subject.sections || []).forEach((sec: SectionItem) => {
@@ -123,7 +131,7 @@ function SubjectDetail({ subject, onClose }: { subject: any; onClose: () => void
   );
 }
 
-function SubjectCard({ sub, index, onClick }: { sub: any; index: number; onClick: () => void }) {
+function SubjectCard({ sub, index, onClick }: { sub: SubjectWithSections; index: number; onClick: () => void }) {
   const grouped = useMemo(() => groupSections(sub.sections || []), [sub.sections]);
 
   return (
@@ -171,7 +179,7 @@ function SubjectCard({ sub, index, onClick }: { sub: any; index: number; onClick
 export default function Home() {
   const { data: mySettings } = trpc.settings.get.useQuery();
   const { data: subjects, isLoading } = trpc.subject.list.useQuery();
-  const [selectedSub, setSelectedSub] = useState<any>(null);
+  const [selectedSub, setSelectedSub] = useState<SubjectWithSections | null>(null);
 
   const examDate = mySettings?.examDate || "2026-12-21";
   const totalTarget = mySettings?.totalTarget || 360;

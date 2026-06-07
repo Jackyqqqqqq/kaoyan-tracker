@@ -49,7 +49,7 @@ export const settingsRouter = createRouter({
     }))
     .mutation(async ({ input }) => {
       const db = getDb();
-      let existing = await db.query.userSettings.findFirst({
+      const existing = await db.query.userSettings.findFirst({
         where: eq(userSettings.userId, input.userId),
       });
       if (!existing) {

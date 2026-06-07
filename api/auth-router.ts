@@ -54,7 +54,8 @@ export const authRouter = createRouter({
 
   me: authedQuery.query(async ({ ctx }) => {
     if (!ctx.user) return null;
-    const { password, ...withoutPw } = ctx.user;
+    const { password: _pw, ...withoutPw } = ctx.user;
+    void _pw;
     return withoutPw;
   }),
 });

@@ -1,9 +1,77 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "5fac4162-5262-4aa2-8e14-2a6ec3785935",
+  "id": "a3c8b149-b7fd-45a6-afc3-d747ac81df9d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "announcements": {
+      "name": "announcements",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "enum('all','personal')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'all'"
+        },
+        "target_user_id": {
+          "name": "target_user_id",
+          "type": "bigint unsigned",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "bigint unsigned",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "announcements_id": {
+          "name": "announcements_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "change_requests": {
       "name": "change_requests",
       "columns": {
@@ -94,78 +162,6 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "global_settings": {
-      "name": "global_settings",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "exam_date": {
-          "name": "exam_date",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'2026-12-21'"
-        },
-        "total_target": {
-          "name": "total_target",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 360
-        },
-        "school_name": {
-          "name": "school_name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'北京邮电大学'"
-        },
-        "major_code": {
-          "name": "major_code",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'11408'"
-        },
-        "description": {
-          "name": "description",
-          "type": "varchar(500)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'计算机考研'"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "global_settings_id": {
-          "name": "global_settings_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
     "subject_sections": {
       "name": "subject_sections",
       "columns": {
@@ -182,6 +178,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "group": {
+          "name": "group",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
         },
         "label": {
           "name": "label",
@@ -205,6 +209,20 @@
           "notNull": true,
           "autoincrement": false,
           "default": 100
+        },
+        "detail": {
+          "name": "detail",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "full_detail": {
+          "name": "full_detail",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         },
         "sort_order": {
           "name": "sort_order",
@@ -274,6 +292,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "full_score": {
+          "name": "full_score",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 100
         },
         "sort_order": {
           "name": "sort_order",
@@ -374,6 +400,92 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
+    "user_settings": {
+      "name": "user_settings",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "bigint unsigned",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "exam_date": {
+          "name": "exam_date",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'2026-12-21'"
+        },
+        "total_target": {
+          "name": "total_target",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 360
+        },
+        "school_name": {
+          "name": "school_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'北京邮电大学'"
+        },
+        "major_code": {
+          "name": "major_code",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'11408'"
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'计算机考研'"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "user_settings_id": {
+          "name": "user_settings_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "user_settings_user_id_unique": {
+          "name": "user_settings_user_id_unique",
+          "columns": [
+            "user_id"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
     "users": {
       "name": "users",
       "columns": {
@@ -429,7 +541,7 @@
         },
         "theme": {
           "name": "theme",
-          "type": "enum('dark','light')",
+          "type": "enum('dark','light','ocean','sakura','cyber')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
@@ -501,6 +613,21 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "enum('all','personal')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'all'"
+        },
+        "target_user_id": {
+          "name": "target_user_id",
+          "type": "bigint unsigned",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "created_by": {

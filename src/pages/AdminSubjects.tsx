@@ -10,8 +10,8 @@ export default function AdminSubjects() {
   const [editingUserId, setEditingUserId] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [subForm, setSubForm] = useState({ name: "", icon: "book", target: 0, fullScore: 150, sections: [{ group: "", label: "", score: 0, fullScore: 0, detail: "", fullDetail: "" }] });
-  const [editSec, setEditSec] = useState<any>(null);
-  const [editSub, setEditSub] = useState<any>(null);
+  const [editSec, setEditSec] = useState<{ id: number; subjectId: number; group: string | null; label: string; score: number | string; fullScore: number | string; detail: string | null; fullDetail: string | null } | null>(null);
+  const [editSub, setEditSub] = useState<{ id: number; name: string; target: number | string; fullScore: number | string } | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
   const [templateApplied, setTemplateApplied] = useState(false);
 
@@ -200,7 +200,7 @@ export default function AdminSubjects() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setEditSub(null)}>
           <div className="glass-card p-6 max-w-sm w-full mx-4" onClick={e => e.stopPropagation()}>
             <h3 className="font-semibold mb-3">编辑科目</h3>
-            <form onSubmit={e => { e.preventDefault(); updateSub.mutate({ id: editSub.id, userId: editingUserId!, name: editSub.name, target: Number(editSub.target), fullScore: Number(editSub.fullScore) }); }} className="space-y-3">
+            <form onSubmit={e => { e.preventDefault(); updateSub.mutate({ id: editSub.id, userId: editingUserId!, name: editSub.name, target: Number(editSub.target) || 0, fullScore: Number(editSub.fullScore) || 0 }); }} className="space-y-3">
               <div><label className="text-xs text-muted-foreground mb-1 block">名称</label><input value={editSub.name} onChange={e => setEditSub({ ...editSub, name: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" required /></div>
               <div className="grid grid-cols-2 gap-2">
                 <div><label className="text-xs text-muted-foreground mb-1 block">目标分</label><input type="number" value={editSub.target} onChange={e => setEditSub({ ...editSub, target: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" required /></div>
@@ -220,7 +220,7 @@ export default function AdminSubjects() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setEditSec(null)}>
           <div className="glass-card p-6 max-w-md w-full mx-4" onClick={e => e.stopPropagation()}>
             <h3 className="font-semibold mb-3">编辑分项</h3>
-            <form onSubmit={e => { e.preventDefault(); updateSec.mutate({ id: editSec.id, group: editSec.group, label: editSec.label, score: Number(editSec.score), fullScore: Number(editSec.fullScore), detail: editSec.detail, fullDetail: editSec.fullDetail }); }} className="space-y-3">
+            <form onSubmit={e => { e.preventDefault(); updateSec.mutate({ id: editSec.id, group: editSec.group || undefined, label: editSec.label, score: Number(editSec.score) || 0, fullScore: Number(editSec.fullScore) || 0, detail: editSec.detail || undefined, fullDetail: editSec.fullDetail || undefined }); }} className="space-y-3">
               <div className="grid grid-cols-2 gap-2">
                 <div><label className="text-xs text-muted-foreground mb-1 block">大类</label><input value={editSec.group || ""} onChange={e => setEditSec({ ...editSec, group: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" /></div>
                 <div><label className="text-xs text-muted-foreground mb-1 block">标签</label><input value={editSec.label} onChange={e => setEditSec({ ...editSec, label: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" required /></div>

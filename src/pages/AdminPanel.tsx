@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { trpc } from "@/providers/trpc";
+import type { UserSetting } from "@db/schema";
 import {
   Shield, UsersRound, AlertCircle, Bell, FileCheck,
   Megaphone, BookOpen, FileText, MessageSquare,
@@ -7,32 +8,13 @@ import {
 } from "lucide-react";
 import { Link } from "react-router";
 
-export default function AdminPanel() {
+function UserSettingsForm({ userId, settings }: { userId: number; settings: UserSetting }) {
   const utils = trpc.useUtils();
-  const { data: stats } = trpc.request.stats.useQuery();
-  const { data: allUsers } = trpc.request.listUsers.useQuery();
-
-  // User target settings
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const { data: userSettingsData } = trpc.settings.getForUser.useQuery(
-    { userId: selectedUserId || 1 },
-    { enabled: !!selectedUserId }
-  );
-  const [examDate, setExamDate] = useState("2026-12-21");
-  const [totalTarget, setTotalTarget] = useState("360");
-  const [schoolName, setSchoolName] = useState("");
-  const [majorCode, setMajorCode] = useState("");
-  const [desc, setDesc] = useState("");
-
-  useEffect(() => {
-    if (userSettingsData) {
-      setExamDate(userSettingsData.examDate);
-      setTotalTarget(String(userSettingsData.totalTarget));
-      setSchoolName(userSettingsData.schoolName);
-      setMajorCode(userSettingsData.majorCode);
-      setDesc(userSettingsData.description);
-    }
-  }, [userSettingsData]);
+  const [examDate, setExamDate] = useState(settings.examDate);
+  const [totalTarget, setTotalTarget] = useState(String(settings.totalTarget));
+  const [schoolName, setSchoolName] = useState(settings.schoolName);
+  const [majorCode, setMajorCode] = useState(settings.majorCode);
+  const [desc, setDesc] = useState(settings.description);
 
   const updateSettings = trpc.settings.updateForUser.useMutation({
     onSuccess: () => utils.settings.getForUser.invalidate(),
@@ -40,9 +22,8 @@ export default function AdminPanel() {
 
   const onSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedUserId) return;
     updateSettings.mutate({
-      userId: selectedUserId,
+      userId,
       examDate: examDate || undefined,
       totalTarget: parseInt(totalTarget) || undefined,
       schoolName: schoolName || undefined,
@@ -50,6 +31,35 @@ export default function AdminPanel() {
       description: desc || undefined,
     });
   };
+
+  return (
+    <form onSubmit={onSaveSettings} className="space-y-3 animate-fade-in">
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className="text-xs text-muted-foreground mb-1 block">学校名称</label><input type="text" value={schoolName} onChange={e => setSchoolName(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" placeholder="如：北京邮电大学" /></div>
+        <div><label className="text-xs text-muted-foreground mb-1 block">专业代码</label><input type="text" value={majorCode} onChange={e => setMajorCode(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" placeholder="如：11408" /></div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div><label className="text-xs text-muted-foreground mb-1 block">考试日期</label><input type="date" value={examDate} onChange={e => setExamDate(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" /></div>
+        <div><label className="text-xs text-muted-foreground mb-1 block">目标总分</label><input type="number" value={totalTarget} onChange={e => setTotalTarget(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" /></div>
+        <div><label className="text-xs text-muted-foreground mb-1 block">描述</label><input type="text" value={desc} onChange={e => setDesc(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" placeholder="如：计算机考研" /></div>
+      </div>
+      <button type="submit" disabled={updateSettings.isPending}
+        className="px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors disabled:opacity-50">
+        {updateSettings.isPending ? "保存中..." : "保存此用户的目标设置"}
+      </button>
+    </form>
+  );
+}
+
+export default function AdminPanel() {
+  const { data: stats } = trpc.request.stats.useQuery();
+  const { data: allUsers } = trpc.request.listUsers.useQuery();
+
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const { data: userSettingsData } = trpc.settings.getForUser.useQuery(
+    { userId: selectedUserId || 1 },
+    { enabled: !!selectedUserId }
+  );
 
   const cards = [
     { icon: Megaphone, label: "公告管理", desc: "发布公告", path: "/admin/announcements" },
@@ -119,22 +129,8 @@ export default function AdminPanel() {
           ))}
         </div>
 
-        {selectedUserId && (
-          <form onSubmit={onSaveSettings} className="space-y-3 animate-fade-in">
-            <div className="grid grid-cols-2 gap-3">
-              <div><label className="text-xs text-muted-foreground mb-1 block">学校名称</label><input type="text" value={schoolName} onChange={e => setSchoolName(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" placeholder="如：北京邮电大学" /></div>
-              <div><label className="text-xs text-muted-foreground mb-1 block">专业代码</label><input type="text" value={majorCode} onChange={e => setMajorCode(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" placeholder="如：11408" /></div>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div><label className="text-xs text-muted-foreground mb-1 block">考试日期</label><input type="date" value={examDate} onChange={e => setExamDate(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" /></div>
-              <div><label className="text-xs text-muted-foreground mb-1 block">目标总分</label><input type="number" value={totalTarget} onChange={e => setTotalTarget(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" /></div>
-              <div><label className="text-xs text-muted-foreground mb-1 block">描述</label><input type="text" value={desc} onChange={e => setDesc(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm" placeholder="如：计算机考研" /></div>
-            </div>
-            <button type="submit" disabled={updateSettings.isPending}
-              className="px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors disabled:opacity-50">
-              {updateSettings.isPending ? "保存中..." : "保存此用户的目标设置"}
-            </button>
-          </form>
+        {selectedUserId && userSettingsData && (
+          <UserSettingsForm key={selectedUserId} userId={selectedUserId} settings={userSettingsData} />
         )}
       </div>
 
